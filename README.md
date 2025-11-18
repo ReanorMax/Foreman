@@ -29,6 +29,12 @@ foreman-docs/
 
 ```
 
+## ⚠️ ВАЖНО: Перед использованием
+
+**Все конфигурационные файлы содержат примеры данных (IP-адреса, MAC-адреса, имена хостов).**
+
+**ОБЯЗАТЕЛЬНО прочитайте [CONFIGURATION.md](CONFIGURATION.md) перед использованием** и замените все примеры на ваши реальные данные.
+
 ## Быстрый старт
 
 1. **Установка Foreman**: См. [docs/01-installation/](docs/01-installation/)
@@ -70,6 +76,18 @@ foreman-docs/
 - [Foreman Documentation](https://theforeman.org/documentation.html)
 - [Debian Preseed](https://wiki.debian.org/DebianInstaller/Preseed)
 - [iPXE Documentation](https://ipxe.org/start)
+
+## Конфигурация
+
+Перед использованием замените все примеры данных на реальные:
+
+- IP-адреса: `192.168.0.x` → ваши реальные IP
+- MAC-адреса: `aa:bb:cc:dd:ee:ff` → ваши реальные MAC
+- FQDN: `server.example.com` → ваш реальный FQDN
+- Nexus URL: `x.x.x.x:8081` → ваш реальный Nexus/артефакты репозиторий
+- Пароли: `TestPassword` → ваши реальные пароли
+
+Подробные инструкции: [CONFIGURATION.md](CONFIGURATION.md)
 
 ## Лицензия
 

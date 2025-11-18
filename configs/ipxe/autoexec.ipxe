@@ -1,5 +1,5 @@
 #!ipxe
 dhcp
-kernel http://10.19.1.209:8000/httpboot/debian12/vmlinuz auto=true priority=critical preseed/url=http://10.19.1.209:8000/unattended/provision?mac=${net0/mac} quiet
-initrd http://10.19.1.209:8000/httpboot/debian12/initrd.gz
+kernel http://192.168.0.100:8000/httpboot/debian12/vmlinuz auto=true priority=critical preseed/url=http://192.168.0.100:8000/unattended/provision?mac=${net0/mac} quiet
+initrd http://192.168.0.100:8000/httpboot/debian12/initrd.gz
 boot

@@ -44,12 +44,12 @@ foreman-installer \
   --enable-puppet \
   --foreman-proxy-dhcp=true \
   --foreman-proxy-dhcp-interface=enp1s0 \
-  --foreman-proxy-dhcp-gateway=10.19.1.1 \
-  --foreman-proxy-dhcp-nameservers="10.19.1.6,8.8.8.8" \
-  --foreman-proxy-dhcp-range="10.19.1.100 10.19.1.200" \
+  --foreman-proxy-dhcp-gateway=192.168.0.1 \
+  --foreman-proxy-dhcp-nameservers="192.168.0.6,8.8.8.8" \
+  --foreman-proxy-dhcp-range="192.168.0.100 192.168.0.200" \
   --foreman-proxy-dhcp-server=127.0.0.1 \
   --foreman-proxy-tftp=true \
-  --foreman-proxy-tftp-servername=10.19.1.209 \
+  --foreman-proxy-tftp-servername=192.168.0.209 \
   --enable-foreman-plugin-ansible \
   --enable-foreman-plugin-templates
 ```
@@ -74,7 +74,7 @@ foreman-rake permissions:reset
 ```
 
 Доступ к веб-интерфейсу:
-- URL: `https://your-server-ip/` или `https://foreman.local/`
+- URL: `https://your-server-ip/` или `https://server.example.com/`
 - Пользователь: `admin`
 - Пароль: (см. команду выше)
 
@@ -86,16 +86,16 @@ foreman-rake permissions:reset
 # /etc/network/interfaces
 auto enp1s0
 iface enp1s0 inet static
-    address 10.19.1.209
+    address 192.168.0.209
     netmask 255.255.255.0
-    gateway 10.19.1.1
+    gateway 192.168.0.1
     dns-nameservers 8.8.8.8 1.1.1.1
 ```
 
 Применить настройки:
 
 ```bash
-ip route add default via 10.19.1.1 dev enp1s0
+ip route add default via 192.168.0.1 dev enp1s0
 systemctl restart networking
 ```
 

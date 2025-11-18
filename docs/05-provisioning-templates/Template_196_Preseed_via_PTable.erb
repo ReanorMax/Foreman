@@ -57,8 +57,8 @@
   end
 
   # Получаем переменные хоста
-  sys_default = as_device(str_param('disk_sys', '/dev/disk/by-id/wwn-0x5000c500a1234567'))  # Заменить на реальный by-id
-  data_default = as_device(str_param('disk_data', '/dev/disk/by-id/wwn-0x5000c500b1234567'))  # Заменить на реальный by-id
+  sys_default = as_device(str_param('disk_sys', '/dev/disk/by-id/wwn-0xEXAMPLE_SYS_DISK'))  # Заменить на реальный by-id
+  data_default = as_device(str_param('disk_data', '/dev/disk/by-id/wwn-0xEXAMPLE_DATA_DISK'))  # Заменить на реальный by-id
   disk_sys = as_device(host_param('disk_sys')) || sys_default
   disk_data = as_device(host_param('disk_data')) || data_default
   data_mount = str_param('data_mount', '/home/storage/local')
@@ -180,7 +180,7 @@ d-i preseed/late_command string \
   logger -t preseed "LATE_CMD: Starting /var LV creation and TPM enrollment"; \
   mkdir -p /target/var/log /target/tmp; \
   echo "STEP1: Starting /var LV creation" >> /target/var/log/var_creation.log 2>&1; \
-  wget -qO /target/tmp/create_var_lv.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/create_var_lv.sh 2>>/target/var/log/var_creation.log; \
+  wget -qO /target/tmp/create_var_lv.sh http://x.x.x.x:8081/repository/artifacts-local/usr/share/foreman/public/create_var_lv.sh 2>>/target/var/log/var_creation.log; \
   echo "STEP2: wget completed with exit code $?" >> /target/var/log/var_creation.log 2>&1; \
   test -f /target/tmp/create_var_lv.sh && echo "STEP3: File exists" >> /target/var/log/var_creation.log 2>&1 || echo "STEP3: File NOT found" >> /target/var/log/var_creation.log 2>&1; \
   test -f /target/tmp/create_var_lv.sh && chmod +x /target/tmp/create_var_lv.sh 2>>/target/var/log/var_creation.log && echo "STEP4: chmod completed" >> /target/var/log/var_creation.log 2>&1; \
@@ -188,7 +188,7 @@ d-i preseed/late_command string \
   echo "STEP7: /var LV creation completed" >> /target/var/log/var_creation.log 2>&1; \
   echo "[$(date)] LATE_CMD: Starting TPM enrollment" >> /target/var/log/tpm.log; \
   logger -t preseed "LATE_CMD: Downloading luks_tpm_enroll.sh"; \
-  if wget -v -O /target/tmp/tpm.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh 2>>/target/var/log/tpm.log; then \
+  if wget -v -O /target/tmp/tpm.sh http://x.x.x.x:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh 2>>/target/var/log/tpm.log; then \
     logger -t preseed "LATE_CMD: luks_tpm_enroll.sh downloaded successfully"; \
     if [ -f /target/tmp/tpm.sh ]; then \
       chmod +x /target/tmp/tpm.sh && logger -t preseed "LATE_CMD: tpm.sh chmod successful"; \
@@ -212,7 +212,7 @@ d-i preseed/late_command string \
 <% end -%> \
   logger -t preseed "LATE_CMD: Mounting data disk <%= disk_data %> to <%= data_mount %>"; \
   mkdir -p /target<%= data_mount %>; \
-  wget -qO /target/tmp/mount_disk.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/mount_disk.sh 2>/dev/null; \
+  wget -qO /target/tmp/mount_disk.sh http://x.x.x.x:8081/repository/artifacts-local/usr/share/foreman/public/mount_disk.sh 2>/dev/null; \
   if [ -f /target/tmp/mount_disk.sh ]; then \
     chmod +x /target/tmp/mount_disk.sh; \
     in-target sh -c "DISK=<%= disk_data %> MOUNT_POINT=<%= data_mount %> /tmp/mount_disk.sh" >> /target/var/log/data_disk_mount.log 2>&1; \

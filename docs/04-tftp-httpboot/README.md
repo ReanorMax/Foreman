@@ -66,8 +66,8 @@ ln -s ../debian12/initrd.gz /var/lib/foreman/public/httpboot/debian12/initrd.gz
 ```ipxe
 #!ipxe
 dhcp
-kernel http://10.19.1.209:8000/httpboot/debian12/vmlinuz auto=true priority=critical preseed/url=http://10.19.1.209:8000/unattended/provision?mac=${net0/mac} quiet
-initrd http://10.19.1.209:8000/httpboot/debian12/initrd.gz
+kernel http://192.168.0.209:8000/httpboot/debian12/vmlinuz auto=true priority=critical preseed/url=http://192.168.0.209:8000/unattended/provision?mac=${net0/mac} quiet
+initrd http://192.168.0.209:8000/httpboot/debian12/initrd.gz
 boot
 ```
 
@@ -81,7 +81,7 @@ quit
 EOF
 
 # HTTPBoot
-curl -I http://10.19.1.209:8000/httpboot/debian12/vmlinuz
+curl -I http://192.168.0.209:8000/httpboot/debian12/vmlinuz
 ```
 
 ## См. также

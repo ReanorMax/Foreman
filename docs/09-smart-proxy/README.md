@@ -12,12 +12,12 @@
 
 ```yaml
 :trusted_hosts:
-  - foreman.local
+  - server.example.com
   - 127.0.0.1
-  - 10.19.1.209
+  - 192.168.0.209
   - localhost
 
-:foreman_url: https://foreman.local
+:foreman_url: https://server.example.com
 :bind_host: '*'
 :http_port: 8000
 :https_port: 8443
@@ -52,7 +52,7 @@
 
 ```yaml
 :enabled: http
-:template_url: http://10.19.1.209:8000
+:template_url: http://192.168.0.209:8000
 ```
 
 ### HTTPBoot модуль: `/etc/foreman-proxy/settings.d/httpboot.yml`

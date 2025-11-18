@@ -1,18 +1,18 @@
 # static DHCP hosts
 
-host deb12-raid1 {
-  hardware ethernet 00:60:e0:b0:db:b5;
-  fixed-address 10.19.1.250;
-  option host-name "deb12-raid1";
-  next-server 10.19.1.209;
+host host1 {
+  hardware ethernet aa:bb:cc:dd:ee:ff;
+  fixed-address 192.168.0.10;
+  option host-name "host1.example.com";
+  next-server 192.168.0.100;
   filename "snponly.efi";
 }
 
-host deb12-luks-backplane {
-  hardware ethernet bc:fc:e7:3b:54:36;
-  fixed-address 10.19.1.251;
-  option host-name "deb12-luks-backplane";
-  next-server 10.19.1.209;
+host host2 {
+  hardware ethernet 11:22:33:44:55:66;
+  fixed-address 192.168.0.11;
+  option host-name "host2.example.com";
+  next-server 192.168.0.100;
   filename "ipxe.efi";
 }
 

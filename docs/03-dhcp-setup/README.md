@@ -21,18 +21,18 @@ DHCP сервер используется для:
 omapi-port 7911;              # Порт для OMAPI (Foreman использует для управления)
 default-lease-time 43200;     # Время аренды по умолчанию (12 часов)
 max-lease-time 86400;         # Максимальное время аренды (24 часа)
-next-server 10.19.1.209;      # IP адрес TFTP/HTTPBoot сервера
+next-server 192.168.0.209;      # IP адрес TFTP/HTTPBoot сервера
 ```
 
 #### Подсеть:
 
 ```dhcp
-subnet 10.19.1.0 netmask 255.255.255.0 {
+subnet 192.168.0.0 netmask 255.255.255.0 {
   option subnet-mask 255.255.255.0;
-  option routers 10.19.1.1;
-  option domain-name-servers 10.19.1.6, 8.8.8.8;
+  option routers 192.168.0.1;
+  option domain-name-servers 192.168.0.6, 8.8.8.8;
   
-  next-server 10.19.1.209;
+  next-server 192.168.0.209;
   # iPXE для UEFI (x64)
   if option architecture = 00:07 {
     filename "ipxe.efi";
@@ -60,19 +60,19 @@ if substring(option vendor-class-identifier, 0, 10) = "HTTPClient" {
 ```dhcp
 # static DHCP hosts
 
-host deb12-raid1 {
-  hardware ethernet 00:60:e0:b0:db:b5;
-  fixed-address 10.19.1.250;
-  option host-name "deb12-raid1";
-  next-server 10.19.1.209;
+host host1.example.com {
+  hardware ethernet aa:bb:cc:dd:ee:ff;
+  fixed-address 192.168.0.250;
+  option host-name "host1.example.com";
+  next-server 192.168.0.209;
   filename "snponly.efi";  # Для Intel I210 NIC
 }
 
-host deb12-luks-backplane {
-  hardware ethernet bc:fc:e7:3b:54:36;
-  fixed-address 10.19.1.251;
-  option host-name "deb12-luks-backplane";
-  next-server 10.19.1.209;
+host host2.example.com {
+  hardware ethernet 11:22:33:44:55:66;
+  fixed-address 192.168.0.251;
+  option host-name "host2.example.com";
+  next-server 192.168.0.209;
   filename "ipxe.efi";
 }
 ```
@@ -86,9 +86,9 @@ host deb12-luks-backplane {
 1. Перейдите в **Инфраструктура → Подсети → Создать подсеть**
 2. Заполните параметры:
    - **Имя**: `Internal Network`
-   - **Сеть**: `10.19.1.0/24`
-   - **Шлюз**: `10.19.1.1`
-   - **DNS серверы**: `10.19.1.6, 8.8.8.8`
+   - **Сеть**: `192.168.0.0/24`
+   - **Шлюз**: `192.168.0.1`
+   - **DNS серверы**: `192.168.0.6, 8.8.8.8`
    - **Smart Proxy**: Выберите ваш Smart Proxy с DHCP
 
 ### Шаг 2: Привязка DHCP Proxy
@@ -105,9 +105,9 @@ host deb12-luks-backplane {
 
 1. Перейдите в **Узлы → Создать узел**
 2. Заполните параметры:
-   - **Имя**: `deb12-raid1.local`
-   - **MAC адрес**: `00:60:e0:b0:db:b5`
-   - **IPv4 адрес**: `10.19.1.250`
+   - **Имя**: `host1.example.com.local`
+   - **MAC адрес**: `aa:bb:cc:dd:ee:ff`
+   - **IPv4 адрес**: `192.168.0.250`
    - **Подсеть**: `Internal Network`
    - **Smart Proxy**: Выберите ваш Smart Proxy
 
@@ -122,9 +122,9 @@ host deb12-luks-backplane {
 ```dhcp
 host new-host {
   hardware ethernet aa:bb:cc:dd:ee:ff;
-  fixed-address 10.19.1.252;
+  fixed-address 192.168.0.252;
   option host-name "new-host";
-  next-server 10.19.1.209;
+  next-server 192.168.0.209;
   filename "ipxe.efi";
 }
 ```
@@ -220,7 +220,7 @@ journalctl -u isc-dhcp-server -n 50
    ```
 
 2. Проверьте настройки Smart Proxy:
-   - URL должен быть доступен: `http://10.19.1.209:8000`
+   - URL должен быть доступен: `http://192.168.0.209:8000`
    - DHCP функция должна быть активна
 
 ## См. также

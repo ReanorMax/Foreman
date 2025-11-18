@@ -24,8 +24,8 @@ cp /usr/share/ipxe/undionly.kpxe /var/lib/tftpboot/
 В `/etc/dhcp/dhcpd.hosts` укажите правильный бинарник для каждого хоста:
 
 ```dhcp
-host deb12-raid1 {
-  hardware ethernet 00:60:e0:b0:db:b5;
+host host1.example.com {
+  hardware ethernet aa:bb:cc:dd:ee:ff;
   filename "snponly.efi";  # Для Intel I210
 }
 ```

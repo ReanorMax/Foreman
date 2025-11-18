@@ -10,7 +10,7 @@
 # Проверка маршрута
 ip route
 # Добавление маршрута
-ip route add default via 10.19.1.1 dev enp1s0
+ip route add default via 192.168.0.1 dev enp1s0
 ```
 
 ### DHCP не выдает IP
@@ -36,7 +36,7 @@ ip route add default via 10.19.1.1 dev enp1s0
 
 1. Используйте стабильные `by-id` пути:
    ```
-   disk_sys = /dev/disk/by-id/wwn-0x5000c500a1234567
+   disk_sys = /dev/disk/by-id/wwn-0xEXAMPLEc500a1234567
    ```
 
 2. Проверьте `partman/early_command` в шаблоне
@@ -46,7 +46,7 @@ ip route add default via 10.19.1.1 dev enp1s0
 1. Проверьте переменную `crypto_passphrase` в параметрах хоста
 2. Проверьте доступность скрипта:
    ```bash
-   wget http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh
+   wget http://192.168.0.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh
    ```
 3. Проверьте логи: `/var/log/tpm.log`
 

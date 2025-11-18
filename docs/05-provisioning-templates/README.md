@@ -22,8 +22,8 @@ Provisioning шаблоны определяют процесс автомати
 
 #### Обязательные переменные:
 
-- `disk_sys`: Системный диск (например, `/dev/sda` или `/dev/disk/by-id/wwn-0x5000c500a1234567`)
-- `disk_data`: Диск данных (например, `/dev/sdb` или `/dev/disk/by-id/wwn-0x5000c500b1234567`)
+- `disk_sys`: Системный диск (например, `/dev/sda` или `/dev/disk/by-id/wwn-0xEXAMPLEc500a1234567`)
+- `disk_data`: Диск данных (например, `/dev/sdb` или `/dev/disk/by-id/wwn-0xEXAMPLEc500b1234567`)
 - `data_mount`: Точка монтирования диска данных (например, `/home/storage/local`)
 
 #### Опциональные переменные (для LUKS):
@@ -51,8 +51,8 @@ Provisioning шаблоны определяют процесс автомати
 2. В разделе **Параметры** добавьте требуемые переменные:
 
 ```
-disk_sys = /dev/disk/by-id/wwn-0x5000c500a1234567
-disk_data = /dev/disk/by-id/wwn-0x5000c500b1234567
+disk_sys = /dev/disk/by-id/wwn-0xEXAMPLEc500a1234567
+disk_data = /dev/disk/by-id/wwn-0xEXAMPLEc500b1234567
 data_mount = /home/storage/local
 crypto_passphrase = ваш_секретный_пароль
 ```
@@ -80,15 +80,15 @@ crypto_passphrase = ваш_секретный_пароль
 ### Скрипты, используемые шаблоном
 
 1. **create_var_lv.sh**: Создание `/var` логического тома (если используется LVM)
-   - Расположение: `http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/create_var_lv.sh`
+   - Расположение: `http://192.168.0.104:8081/repository/artifacts-local/usr/share/foreman/public/create_var_lv.sh`
    - См. [configs/scripts/create_var_lv.sh](../../configs/scripts/create_var_lv.sh)
 
 2. **luks_tpm_enroll.sh**: Регистрация LUKS раздела в TPM2
-   - Расположение: `http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh`
+   - Расположение: `http://192.168.0.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh`
    - См. [configs/scripts/luks_tpm_enroll.sh](../../configs/scripts/luks_tpm_enroll.sh)
 
 3. **mount_disk.sh**: Разметка, форматирование и монтирование диска данных
-   - Расположение: `http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/mount_disk.sh`
+   - Расположение: `http://192.168.0.104:8081/repository/artifacts-local/usr/share/foreman/public/mount_disk.sh`
    - См. [configs/scripts/mount_disk.sh](../../configs/scripts/mount_disk.sh)
 
 ## Альтернативные шаблоны

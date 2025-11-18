@@ -6,9 +6,9 @@
 
 1. Перейдите в **Узлы → Создать узел**
 2. Заполните параметры:
-   - **Имя**: `deb12-luks-backplane.local`
-   - **MAC адрес**: `bc:fc:e7:3b:54:36`
-   - **IPv4 адрес**: `10.19.1.251`
+   - **Имя**: `host2.example.com.local`
+   - **MAC адрес**: `11:22:33:44:55:66`
+   - **IPv4 адрес**: `192.168.0.251`
    - **Подсеть**: `Internal Network`
    - **Smart Proxy**: Выберите ваш Smart Proxy
    - **Операционная система**: `Debian 12.12`
@@ -23,8 +23,8 @@
 ### Для LUKS/TPM шифрования:
 
 ```
-disk_sys = /dev/disk/by-id/wwn-0x5000c500a1234567
-disk_data = /dev/disk/by-id/wwn-0x5000c500b1234567
+disk_sys = /dev/disk/by-id/wwn-0xEXAMPLEc500a1234567
+disk_data = /dev/disk/by-id/wwn-0xEXAMPLEc500b1234567
 data_mount = /home/storage/local
 crypto_passphrase = ваш_секретный_пароль
 var_size = 40G
