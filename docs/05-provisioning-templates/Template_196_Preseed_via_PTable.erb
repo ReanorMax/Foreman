@@ -1,0 +1,228 @@
+# Template 196: Preseed via PTable (no partman)
+# Описание: Provisioning шаблон для автоматической установки Debian 12 с поддержкой LUKS/TPM шифрования
+
+<%#
+# Template 196: Preseed via PTable (no partman)
+# Этот шаблон обеспечивает автоматическую установку Debian 12 с поддержкой:
+# - LUKS/TPM шифрования с автоматической разблокировкой через TPM2
+# - Гибкого разделения дисков через переменные хоста
+# - Автоматического монтирования дисков данных
+# - Создания /var раздела при необходимости
+#
+# Требуемые переменные хоста:
+# - disk_sys: Системный диск (например, /dev/sda или /dev/disk/by-id/xxx)
+# - disk_data: Диск данных (например, /dev/sdb или /dev/disk/by-id/xxx)
+# - data_mount: Точка монтирования диска данных (например, /home/storage/local)
+# - crypto_passphrase: Парольная фраза для LUKS (если используется шифрование)
+# - var_size: Размер /var раздела в GB (по умолчанию 40G)
+# - root_size: Размер корневого раздела в GB (по умолчанию 100G)
+# - home_size: Размер /home раздела в GB (по умолчанию 20G)
+# - swap_size: Размер swap раздела в GB (по умолчанию 2G)
+-%>
+
+<%#
+# Вспомогательные функции Ruby
+-%>
+<%
+  # Функция для преобразования пути диска в корректный формат
+  def as_device(dev)
+    return nil if dev.nil? || dev.to_s.strip.empty?
+    dev = dev.to_s.strip
+    # Если путь начинается с /dev/, оставляем как есть
+    # Если путь начинается с by-id/, добавляем /dev/
+    if dev.start_with?('/dev/')
+      dev
+    elsif dev.start_with?('by-id/') || dev.start_with?('disk/by-id/')
+      "/dev/#{dev}" unless dev.start_with?('/dev/')
+      dev
+    else
+      "/dev/#{dev}"
+    end
+  end
+
+  # Функция для получения строкового параметра хоста
+  def str_param(name, default = nil)
+    value = host_param(name)
+    return default if value.nil? || value.to_s.strip.empty?
+    value.to_s.strip
+  end
+
+  # Функция для получения числового параметра хоста
+  def int_param(name, default = 0)
+    value = host_param(name)
+    return default if value.nil?
+    value.to_i
+  rescue
+    default
+  end
+
+  # Получаем переменные хоста
+  sys_default = as_device(str_param('disk_sys', '/dev/disk/by-id/wwn-0x5000c500a1234567'))  # Заменить на реальный by-id
+  data_default = as_device(str_param('disk_data', '/dev/disk/by-id/wwn-0x5000c500b1234567'))  # Заменить на реальный by-id
+  disk_sys = as_device(host_param('disk_sys')) || sys_default
+  disk_data = as_device(host_param('disk_data')) || data_default
+  data_mount = str_param('data_mount', '/home/storage/local')
+  crypto_pass = str_param('crypto_passphrase', '')
+  var_size = str_param('var_size', '40G')
+  root_size = str_param('root_size', '100G')
+  home_size = str_param('home_size', '20G')
+  swap_size = str_param('swap_size', '2G')
+-%>
+
+# Основные настройки локализации
+d-i debian-installer/locale string en_US.UTF-8
+
+# Настройки клавиатуры
+d-i keyboard-configuration/xkb-keymap select us
+
+# Настройки сети (автоматическое определение через DHCP)
+d-i netcfg/choose_interface select auto
+d-i netcfg/dhcp_timeout string 60
+
+# Настройки зеркала
+d-i mirror/country string manual
+d-i mirror/http/hostname string deb.debian.org
+d-i mirror/http/directory string /debian
+d-i mirror/http/proxy string
+
+# Настройки пароля root
+d-i passwd/root-password password <%= root_password %>
+d-i passwd/root-password-again password <%= root_password %>
+d-i passwd/make-user boolean false
+
+# Настройки часового пояса
+d-i time/zone string UTC
+d-i clock-setup/utc boolean true
+d-i clock-setup/ntp boolean true
+
+# Настройки разметки диска
+<% if crypto_pass != '' -%>
+# LUKS шифрование включено
+d-i partman/early_command string \
+  logger -t preseed "PARTMAN_EARLY: Starting disk selection for LUKS"; \
+  DISK_SYS="<%= disk_sys %>"; \
+  if [ ! -b "$DISK_SYS" ]; then \
+    logger -t preseed "PARTMAN_EARLY: $DISK_SYS not found, searching for small disk"; \
+    SMALL_DISK=$(lsblk -d -n -o NAME,SIZE | awk '{print $1"/dev/"$1,$2}' | while read dev size; do \
+      size_bytes=$(numfmt --from=iec "${size}B" 2>/dev/null || echo 0); \
+      echo "$dev $size_bytes"; \
+    done | sort -k2 -n | head -1 | awk '{print $1}'); \
+    if [ -n "$SMALL_DISK" ] && [ -b "$SMALL_DISK" ]; then \
+      DISK_SYS="$SMALL_DISK"; \
+      logger -t preseed "PARTMAN_EARLY: Selected small disk: $DISK_SYS ($(lsblk -d -n -o SIZE $DISK_SYS))"; \
+    else \
+      logger -t preseed "PARTMAN_EARLY: ERROR - No suitable disk found"; \
+      exit 1; \
+    fi; \
+  fi; \
+  logger -t preseed "PARTMAN_EARLY: Setting disk to $DISK_SYS"; \
+  db_set partman-auto/disk "$DISK_SYS"; \
+  db_set partman/choose_disk "$DISK_SYS"; \
+  db_set partman-auto/disk_choice "$DISK_SYS"; \
+  db_input critical partman/choose_disk; \
+  db_go; \
+  db_set partman-auto/disk "$DISK_SYS"; \
+  db_input critical partman-auto/disk; \
+  db_go; \
+  logger -t preseed "PARTMAN_EARLY: Disk selection completed";
+
+d-i partman-auto/method string crypto
+d-i partman-auto-lvm/guided_size string 162000
+d-i partman-auto-lvm/new_vg_name string debian-vg
+d-i partman-auto/choose_recipe select home
+d-i partman-auto/disk string <%= disk_sys %>
+
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-auto-lvm/guided_size string 162000
+
+d-i partman-crypto/passphrase password <%= crypto_pass.to_s.gsub("'", "'\\\\''") %>
+d-i partman-crypto/passphrase-again password <%= crypto_pass.to_s.gsub("'", "'\\\\''") %>
+
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+
+<% else -%>
+# LUKS шифрование отключено, обычная разметка
+d-i partman-auto/method string regular
+d-i partman-auto/disk string <%= disk_sys %>
+d-i partman-auto/choose_recipe select atomic
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+<% end -%>
+
+d-i partman-md/device_remove_md boolean true
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+# Настройки загрузчика
+d-i grub-installer/bootdev string <%= disk_sys %>
+d-i grub-installer/only_debian boolean true
+d-i finish-install/keep-consoles boolean false
+d-i console-setup/ask_detect boolean false
+d-i console-setup/layoutcode string us
+
+# Настройки базовой системы
+d-i pkgsel/include string openssh-server curl wget net-tools htop vim
+
+# Настройки программного обеспечения
+popularity-contest popularity-contest/participate boolean false
+
+# Команды, выполняемые после установки (late_command)
+d-i preseed/late_command string \
+  in-target mkdir -p <%= data_mount %> /var/log; \
+<% if crypto_pass != '' -%> \
+  logger -t preseed "LATE_CMD: Starting /var LV creation and TPM enrollment"; \
+  mkdir -p /target/var/log /target/tmp; \
+  echo "STEP1: Starting /var LV creation" >> /target/var/log/var_creation.log 2>&1; \
+  wget -qO /target/tmp/create_var_lv.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/create_var_lv.sh 2>>/target/var/log/var_creation.log; \
+  echo "STEP2: wget completed with exit code $?" >> /target/var/log/var_creation.log 2>&1; \
+  test -f /target/tmp/create_var_lv.sh && echo "STEP3: File exists" >> /target/var/log/var_creation.log 2>&1 || echo "STEP3: File NOT found" >> /target/var/log/var_creation.log 2>&1; \
+  test -f /target/tmp/create_var_lv.sh && chmod +x /target/tmp/create_var_lv.sh 2>>/target/var/log/var_creation.log && echo "STEP4: chmod completed" >> /target/var/log/var_creation.log 2>&1; \
+  test -f /target/tmp/create_var_lv.sh && echo "STEP5: Executing script" >> /target/var/log/var_creation.log 2>&1 && VAR_SIZE="<%= var_size %>" /target/tmp/create_var_lv.sh >> /target/var/log/var_creation.log 2>&1 && echo "STEP6: Script completed with exit code $?" >> /target/var/log/var_creation.log 2>&1 || echo "STEP6: Script execution failed or file not found" >> /target/var/log/var_creation.log 2>&1; \
+  echo "STEP7: /var LV creation completed" >> /target/var/log/var_creation.log 2>&1; \
+  echo "[$(date)] LATE_CMD: Starting TPM enrollment" >> /target/var/log/tpm.log; \
+  logger -t preseed "LATE_CMD: Downloading luks_tpm_enroll.sh"; \
+  if wget -v -O /target/tmp/tpm.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/luks_tpm_enroll.sh 2>>/target/var/log/tpm.log; then \
+    logger -t preseed "LATE_CMD: luks_tpm_enroll.sh downloaded successfully"; \
+    if [ -f /target/tmp/tpm.sh ]; then \
+      chmod +x /target/tmp/tpm.sh && logger -t preseed "LATE_CMD: tpm.sh chmod successful"; \
+      printf '%s' '<%= crypto_pass.to_s.gsub("'", "'\\\\''") %>' > /target/tmp/pass.tmp; \
+      chmod 600 /target/tmp/pass.tmp; \
+      in-target sh -c 'LUKS_PASSPHRASE_FILE=/tmp/pass.tmp /tmp/tpm.sh' >> /target/var/log/tpm.log 2>&1 && logger -t preseed "LATE_CMD: tpm.sh executed successfully" || logger -t preseed "LATE_CMD: ERROR - tpm.sh failed, check /target/var/log/tpm.log"; \
+      rm -f /target/tmp/pass.tmp; \
+    else \
+      logger -t preseed "LATE_CMD: ERROR - tpm.sh not found after download"; \
+      echo "[$(date)] ERROR: tpm.sh not found after download" >> /target/var/log/tpm.log; \
+    fi; \
+  else \
+    logger -t preseed "LATE_CMD: ERROR - Failed to download luks_tpm_enroll.sh"; \
+    echo "[$(date)] ERROR: Failed to download luks_tpm_enroll.sh" >> /target/var/log/tpm.log; \
+  fi; \
+  logger -t preseed "LATE_CMD: TPM enrollment completed"; \
+<% else -%> \
+  mkdir -p /target/var/log; \
+  echo "[$(date)] LATE_CMD: Skipping TPM enrollment - crypto_passphrase not set" > /target/var/log/tpm.log; \
+  logger -t preseed "LATE_CMD: Skipping TPM enrollment - crypto_passphrase not set"; \
+<% end -%> \
+  logger -t preseed "LATE_CMD: Mounting data disk <%= disk_data %> to <%= data_mount %>"; \
+  mkdir -p /target<%= data_mount %>; \
+  wget -qO /target/tmp/mount_disk.sh http://10.19.1.104:8081/repository/artifacts-local/usr/share/foreman/public/mount_disk.sh 2>/dev/null; \
+  if [ -f /target/tmp/mount_disk.sh ]; then \
+    chmod +x /target/tmp/mount_disk.sh; \
+    in-target sh -c "DISK=<%= disk_data %> MOUNT_POINT=<%= data_mount %> /tmp/mount_disk.sh" >> /target/var/log/data_disk_mount.log 2>&1; \
+    logger -t preseed "LATE_CMD: Data disk mounting completed"; \
+  else \
+    logger -t preseed "LATE_CMD: ERROR - mount_disk.sh not found"; \
+  fi; \
+  logger -t preseed "LATE_CMD: All commands completed"; \
+  true
+
+# Настройки завершения установки
+d-i finish-install/reboot_in_progress note
+

@@ -1,0 +1,5 @@
+---
+:enabled: true
+:log_files:
+  :foreman-proxy: /var/log/foreman-proxy/proxy.log
+  :foreman: /var/log/foreman/production.log
