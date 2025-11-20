@@ -75,7 +75,8 @@ foreman-docs/
 
 - [TRANSFER_GUIDE.md](TRANSFER_GUIDE.md) - Практическое руководство по Foreman для коллеги
 - [GITLAB_RUNNER_GUIDE.md](GITLAB_RUNNER_GUIDE.md) - Гайд по GitLab Runner
-- [TELEGRAM_BOT_GUIDE.md](TELEGRAM_BOT_GUIDE.md) - Гайд по Telegram боту (требует дополнения)
+- [PBX_IAC_PROJECT.md](PBX_IAC_PROJECT.md) - Документация по проекту PBX IAC (Infrastructure as Code) со схемами работы
+- [TELEGRAM_BOT_GUIDE.md](TELEGRAM_BOT_GUIDE.md) - Гайд по Telegram боту для GitLab webhook
 
 ## Полезные ссылки
 
