@@ -23,16 +23,22 @@
 - ❌ Telegram бот **НЕ** найден в screen/tmux сессиях
 - ❌ Telegram бот **НЕ** найден в GitLab проектах
 
+**Самодельные (кастомные) сервисы на сервере:**
+- ✅ `gitlab-runner.service` - GitLab Runner (кастомный сервис, не стандартный)
+
+**Стандартные сервисы (не самодельные):**
+- Все остальные сервисы - стандартные системные (systemd, networkd, ssh, cron и т.д.)
+
 **Возможные варианты:**
 1. Бот запускается вручную (не автоматически)
 2. Бот находится на другом сервере
 3. Бот запускается через GitLab Runner (как CI/CD задача)
-4. Бот не настроен как сервис
+4. Бот не настроен как сервис (запускается вручную при необходимости)
 
 **⚠️ ОБЯЗАТЕЛЬНО уточните у передающего коллеги:**
-- Где именно находится код бота?
-- Как он запускается?
-- На каком сервере он работает?
+- Где именно находится код бота? (точный путь)
+- Как он запускается? (вручную, через другой сервис, через GitLab Runner)
+- На каком сервере он работает? (возможно не на 10.19.1.20)
 
 ---
 
@@ -45,26 +51,9 @@
 - `/opt/` - проверено, файлов бота нет
 - `/var/opt/` - проверено, файлов бота нет
 - Systemd сервисы - проверено, сервиса бота нет
-- Процессы Python - только системные процессы
+- Процессы Python - только системные процессы (`networkd-dispatcher`, `unattended-upgrades`)
 - Crontab - пусто
 - Screen/Tmux сессии - нет активных сессий
-
-Типичные места расположения:
-- `/home/sphere/telegram_bot/` или `/home/sphere/bot/`
-- `/opt/telegram_bot/` или `/opt/bot/`
-- `/var/opt/telegram_bot/`
-
-**Для поиска бота на сервере:**
-```bash
-# Поиск файлов Python бота
-find /home /opt /var -name "*.py" -type f 2>/dev/null | xargs grep -l "telegram\|Bot\|TOKEN" 2>/dev/null
-
-# Поиск по имени файла
-find /home /opt /var -name "*bot*.py" -o -name "*telegram*.py" 2>/dev/null
-
-# Поиск в домашней директории пользователя
-find ~ -name "*.py" -type f 2>/dev/null
-```
 
 ---
 
@@ -102,7 +91,7 @@ sudo journalctl -u telegram-bot -n 50
 # Список всех сервисов
 systemctl list-units --type=service --all | grep -i bot
 systemctl list-units --type=service --all | grep -i telegram
-systemctl list-units --type=service --all | grep python
+systemctl list-units --type=service --all | grep -i python
 ```
 
 ### Способ 2: Вручную через Python
@@ -144,6 +133,21 @@ source .venv/bin/activate
 
 # Запустить бота
 python bot.py
+```
+
+### Способ 4: Через GitLab Runner (если бот в GitLab проекте)
+
+Если бот запускается через GitLab Runner, то:
+1. Код бота должен быть в GitLab проекте
+2. В проекте должен быть `.gitlab-ci.yml` файл
+3. Pipeline должен запускать бота
+
+**Проверка:**
+```bash
+# На сервере GitLab Runner (10.19.1.108)
+# Проверить задачи для проекта с ботом
+gitlab-runner list
+journalctl -u gitlab-runner | grep -i telegram
 ```
 
 ---
@@ -479,4 +483,3 @@ ls -la /path/to/bot/
 ---
 
 **⚠️ ВАЖНО: Эта документация - шаблон. После получения информации от передающего коллеги дополните её конкретными путями, командами и функциональностью бота!**
-
