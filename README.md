@@ -71,11 +71,18 @@ foreman-docs/
 - **RAID контроллер**: Avago MegaRAID MR9361-8i
 - **Encryption**: LUKS2 + Clevis + TPM2
 
+## Гайды для передачи дел
+
+- [TRANSFER_GUIDE.md](TRANSFER_GUIDE.md) - Практическое руководство по Foreman для коллеги
+- [GITLAB_RUNNER_GUIDE.md](GITLAB_RUNNER_GUIDE.md) - Гайд по GitLab Runner
+- [TELEGRAM_BOT_GUIDE.md](TELEGRAM_BOT_GUIDE.md) - Гайд по Telegram боту (требует дополнения)
+
 ## Полезные ссылки
 
 - [Foreman Documentation](https://theforeman.org/documentation.html)
 - [Debian Preseed](https://wiki.debian.org/DebianInstaller/Preseed)
 - [iPXE Documentation](https://ipxe.org/start)
+- [GitLab Runner Documentation](https://docs.gitlab.com/runner/)
 
 ## Конфигурация
 
