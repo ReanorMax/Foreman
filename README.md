@@ -78,6 +78,7 @@ foreman-docs/
 - [PBX_IAC_PROJECT.md](PBX_IAC_PROJECT.md) - Документация по проекту PBX IAC (Infrastructure as Code) со схемами работы
 - [TELEGRAM_BOT_GUIDE.md](TELEGRAM_BOT_GUIDE.md) - Гайд по Telegram боту для GitLab webhook
 - [NETWORK_DEVICE_CONFIGURATOR.md](NETWORK_DEVICE_CONFIGURATOR.md) - Документация по проекту Network Device Configurator (NDC) для автоматической конфигурации сетевого оборудования
+- [EOIP_TUNNEL.md](EOIP_TUNNEL.md) - Документация по проекту EoIP Tunnel для автоматической настройки eoIP-туннелей на MikroTik устройствах
 
 ## Полезные ссылки
 
