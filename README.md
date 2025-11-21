@@ -77,6 +77,7 @@ foreman-docs/
 - [GITLAB_RUNNER_GUIDE.md](GITLAB_RUNNER_GUIDE.md) - Гайд по GitLab Runner
 - [PBX_IAC_PROJECT.md](PBX_IAC_PROJECT.md) - Документация по проекту PBX IAC (Infrastructure as Code) со схемами работы
 - [TELEGRAM_BOT_GUIDE.md](TELEGRAM_BOT_GUIDE.md) - Гайд по Telegram боту для GitLab webhook
+- [NETWORK_DEVICE_CONFIGURATOR.md](NETWORK_DEVICE_CONFIGURATOR.md) - Документация по проекту Network Device Configurator (NDC) для автоматической конфигурации сетевого оборудования
 
 ## Полезные ссылки
 
